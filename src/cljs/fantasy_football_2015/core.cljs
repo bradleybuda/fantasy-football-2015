@@ -3,8 +3,16 @@
 
 (defonce app-state (reagent/atom {:text "Hello, what is your name? "}))
 
+(def roster-composition
+  [:qb :rb :rb :wr :wr :te :flex :d/st :k
+   :bench :bench :bench :bench :bench :bench :bench])
+
 (defn page []
-  [:div (@app-state :text) "FIXME"])
+  [:table
+   [:tr
+    (for [[idx roster-position] (map-indexed (fn [idx item] [idx (str item)]) roster-composition)]
+      ^{:key idx} [:td roster-position])
+    ]])
 
 (defn ^:export main []
   (reagent/render [page]
