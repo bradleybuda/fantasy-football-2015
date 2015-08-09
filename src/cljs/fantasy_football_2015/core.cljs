@@ -31,6 +31,7 @@
    (for [[member-idx member] (map-indexed (fn [member-idx member] [member-idx (str member)]) members-in-draft-order)]
      ^{:key member-idx}
      [:tr
+      {:class (if (= member (str me)) "me" "opponent")}
       [:th member]
       (for [[idx roster-position] (map-indexed (fn [idx item] [idx (str item)]) roster-composition)]
         ^{:key idx} [:td roster-position])])])
