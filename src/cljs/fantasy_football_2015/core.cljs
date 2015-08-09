@@ -16,7 +16,7 @@
    :jeff-mazer :eric-eleton :nick-horton :josh-harris])
 
 (def all-players
-  [:alice :bob :charlie])
+  ["Alice" "Bob" "Charlie"])
 
 (defonce app-state
   (reagent/atom
@@ -25,7 +25,7 @@
 
 (def me :bradley-buda)
 
-(def members-table
+(defn members-table []
   [:table
    [:th "Draft Selections"]
    (for [[member-idx member] (map-indexed (fn [member-idx member] [member-idx (str member)]) members-in-draft-order)]
@@ -35,18 +35,16 @@
       (for [[idx roster-position] (map-indexed (fn [idx item] [idx (str item)]) roster-composition)]
         ^{:key idx} [:td roster-position])])])
 
-(def players-table
+(defn players-table []
   [:table
    [:th "Available Players"]
-   (for [[player-idx player] (map-indexed (fn [player-idx player] [player-idx (str player)]) all-players)]
-     ^{:key player-idx}
-     [:tr
-      [:td player]])])
+   (for [player all-players]
+     [:tr [:td player]])])
 
 (defn page []
   [:div
-   members-table
-   players-table]
+   [members-table]
+   [players-table]]
   )
 
 (defn ^:export main []
