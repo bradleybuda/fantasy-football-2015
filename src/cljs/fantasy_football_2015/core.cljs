@@ -26,7 +26,7 @@
 (def me :bradley-buda)
 
 (defn members-table []
-  [:table
+  [:table.members-table
    [:th "Draft Selections"]
    (for [[member-idx member] (map-indexed (fn [member-idx member] [member-idx (str member)]) members-in-draft-order)]
      ^{:key member-idx}
@@ -43,10 +43,11 @@
      [:tr [:td player]])])
 
 (defn page []
-  [:div
-   [members-table]
-   [players-table]]
-  )
+  [:div.page
+   [:div.members
+    [members-table]]
+   [:div.players
+    [players-table]]])
 
 (defn ^:export main []
   (reagent/render [page]
