@@ -30,23 +30,26 @@
   (nth (snake-pick-sequence) (next-pick-index)))
 
 (defn members-table []
-  [:table.members-table
-   [:th "Draft Selections"]
-   (for [[member-idx member] (map-indexed (fn [member-idx member] [member-idx (str member)]) members-in-draft-order)]
-     ^{:key member-idx}
-     [:tr
-      {:class
-       (str
-        (if (= member (str me)) "me" "opponent")
-        (if (= member (str (next-pick))) " next-pick"))}
-      [:th member]
-      (for [[idx roster-position] (map-indexed (fn [idx item] [idx (str item)]) roster-composition)]
-        ^{:key idx} [:td roster-position])])])
+  (let [next-pick (next-pick)]
+    [:table.members-table
+     [:th "Draft Selections"]
+     (for [[member-idx member] (map-indexed (fn [member-idx member] [member-idx (str member)]) members-in-draft-order)]
+       ^{:key member-idx}
+       [:tr
+        {:class
+         (str
+          ;; TODO this stf manip stuff sucks
+          (if (= member (str me)) "me" "opponent")
+          (if (= member (str next-pick)) " next-pick"))}
+        [:th member]
+        (for [[idx roster-position] (map-indexed (fn [idx item] [idx (str item)]) roster-composition)]
+          ^{:key idx} [:td roster-position])])]))
 
 (defn players-table []
   [:table
    [:th "Available Players"]
    (for [player all-players]
+     ^{:key player}
      [:tr [:td player]])])
 
 (defn page []

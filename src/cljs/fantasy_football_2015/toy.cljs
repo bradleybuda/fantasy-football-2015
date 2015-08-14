@@ -9,4 +9,4 @@
 
 ;; TODO
 (def all-players
-  (repeatedly 100 #(rand-int 100000)))
+  (repeatedly 80 #(rand-int 100000)))
