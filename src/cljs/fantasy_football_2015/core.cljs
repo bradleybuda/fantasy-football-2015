@@ -53,11 +53,15 @@
 
 (defn players-table []
   [:table
-   [:th "Available Players"]
+   [:tr
+    [:th "Player"]
+    [:th "Position"]
+    [:td]]
    (for [[player-idx player] (map-indexed vector all-players)]
      ^{:key player-idx}
      [:tr
-      [:td player]
+      [:td (:name player)]
+      [:td (:position player)]
       [:td [:button {:on-click (partial pick-player player)} "Draft"]]])])
 
 (defn page []

@@ -1,7 +1,11 @@
-(ns fantasy-football-2015.toy)
+(ns fantasy-football-2015.toy
+  (:require [clojure.set :refer [difference]]))
 
 (def roster-composition
-  [:qb :rb :rb :wr :te :flex :k :bench :bench])
+  ["QB" "RB" "RB" "WR" "TE" "Flex" "K" "Bench" "Bench"])
+
+(def positions
+  (difference (set roster-composition) #{"Flex" "Bench"}))
 
 ;; TODO update with proper order
 (def members-in-draft-order
@@ -9,4 +13,7 @@
 
 ;; TODO
 (def all-players
-  (repeatedly 80 #(rand-int 100000)))
+  (repeatedly 80
+              (fn []
+                {:name (rand-int 1000000)
+                 :position (rand-nth (seq positions))})))
