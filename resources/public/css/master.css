@@ -11,3 +11,7 @@ body {
 .members-table .me {
   background-color: lightblue;
 }
+
+.members-table .next-pick th:before {
+  content: '\BB';
+}

@@ -5,7 +5,7 @@
 
 ;; TODO update with proper order
 (def members-in-draft-order
-  [:larry-whalen :david-baum :bradley-buda :blake-wilson])
+  ["Larry Whalen" "David Baum" "Bradley Buda" "Blake Wilson"])
 
 ;; TODO
 (def all-players

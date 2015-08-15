@@ -5,6 +5,8 @@
              fantasy-football-2015.toy
              :refer [roster-composition members-in-draft-order all-players]]))
 
+(enable-console-print!)
+
 ;; TODO should I be division-aware? Might be useful to penalize my
 ;; division opponents more
 
@@ -26,34 +28,41 @@
   (let [draft-order (:members-in-draft-order @app-state)]
     (cycle (concat draft-order (reverse draft-order)))))
 
-(defn next-pick []
+(defn next-member-to-pick []
   (nth (snake-pick-sequence) (next-pick-index)))
 
 (defn members-table []
-  (let [next-pick (next-pick)]
+  (let [next-member-to-pick (next-member-to-pick)]
     [:table.members-table
      [:th "Draft Selections"]
-     (for [[member-idx member] (map-indexed (fn [member-idx member] [member-idx (str member)]) members-in-draft-order)]
-       ^{:key member-idx}
+     (for [member members-in-draft-order]
+       ^{:key member}
        [:tr
         {:class
          (str
-          ;; TODO this stf manip stuff sucks
-          (if (= member (str me)) "me" "opponent")
-          (if (= member (str next-pick)) " next-pick"))}
+          (if (= member me) "me" "opponent")
+          (if (= member next-member-to-pick) " next-pick"))}
         [:th member]
-        (for [[idx roster-position] (map-indexed (fn [idx item] [idx (str item)]) roster-composition)]
-          ^{:key idx} [:td roster-position])])]))
+        (for [[roster-position-idx roster-position] (map-indexed vector roster-composition)]
+          ^{:key roster-position-idx} [:td (str roster-position)])])]))
+
+(defn pick-player [player]
+  (swap! app-state
+         (fn [state]
+           (update-in state [:picked-players] #(conj %1 player)))))
 
 (defn players-table []
   [:table
    [:th "Available Players"]
-   (for [player all-players]
-     ^{:key player}
-     [:tr [:td player]])])
+   (for [[player-idx player] (map-indexed vector all-players)]
+     ^{:key player-idx}
+     [:tr
+      [:td player]
+      [:td [:button {:on-click (partial pick-player player)} "Draft"]]])])
 
 (defn page []
   [:div.page
+;;   [:pre.debug (pr-str @app-state)]
    [:div.members
     [members-table]]
    [:div.players
