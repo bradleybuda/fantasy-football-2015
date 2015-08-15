@@ -10,7 +10,9 @@
 ;; TODO should I be division-aware? Might be useful to penalize my
 ;; division opponents more
 
-;; TODO actually reference this in views
+
+;; TODO more consitent state handling - don't access it as a global
+
 (defonce app-state
   (reagent/atom
    {:available-players all-players
@@ -31,8 +33,25 @@
 (defn next-member-to-pick []
   (nth (snake-pick-sequence) (next-pick-index)))
 
+(defn picked-players-for-member [member picked-players]
+  (let [picked-players-with-members (map vector picked-players (snake-pick-sequence))]
+    (map first
+         (filter (fn [[_ picking-member] _]
+                   (= member picking-member))
+                 picked-players-with-members))))
+
+;; (defn roster-for-member [member picked-players]
+;;   (let [players-for-member (picked-players-for-member member pick-players)]
+
+;;     )
+;;   )
+
+;; (defn remaining-roster-for-member
+;;   [member remaining-players remaining-roster-composition])
+
 (defn members-table []
-  (let [next-member-to-pick (next-member-to-pick)]
+  (let [next-member-to-pick (next-member-to-pick)
+        picked-players (:picked-players @app-state)]
     [:table.members-table
      [:th "Draft Selections"]
      (for [member members-in-draft-order]
@@ -43,8 +62,8 @@
           (if (= member me) "me" "opponent")
           (if (= member next-member-to-pick) " next-pick"))}
         [:th member]
-        (for [[roster-position-idx roster-position] (map-indexed vector roster-composition)]
-          ^{:key roster-position-idx} [:td (str roster-position)])])]))
+        (for [picked-player (picked-players-for-member member picked-players)]
+          [:span (:name picked-player)])])]))
 
 (defn pick-player [player]
   (swap! app-state
