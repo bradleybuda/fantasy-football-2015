@@ -12,29 +12,22 @@
 
 
 ;; TODO more consitent state handling - don't access it as a global
-
-(defonce app-state
-  (reagent/atom
-   {:available-players all-players
-    :roster-composition roster-composition
-    :members-in-draft-order members-in-draft-order
-    :picked-players []}))
-
 (def me :bradley-buda)
 
 ;; zero-based
-(defn next-pick-index []
-  (count (:picked-players @app-state)))
+(defn next-pick-index [app-state]
+  (count (:picked-players app-state)))
 
-(defn snake-pick-sequence []
-  (let [draft-order (:members-in-draft-order @app-state)]
+(defn snake-pick-sequence [app-state]
+  (let [draft-order (:members-in-draft-order app-state)]
     (cycle (concat draft-order (reverse draft-order)))))
 
-(defn next-member-to-pick []
-  (nth (snake-pick-sequence) (next-pick-index)))
+(defn next-member-to-pick [app-state]
+  (nth (snake-pick-sequence app-state) (next-pick-index app-state)))
 
-(defn picked-players-for-member [member picked-players]
-  (let [picked-players-with-members (map vector picked-players (snake-pick-sequence))]
+(defn picked-players-for-member [member app-state]
+  (let [picked-players (:picked-players app-state)
+        picked-players-with-members (map vector picked-players (snake-pick-sequence app-state))]
     (map first
          (filter (fn [[_ picking-member] _]
                    (= member picking-member))
@@ -49,9 +42,31 @@
 ;; (defn remaining-roster-for-member
 ;;   [member remaining-players remaining-roster-composition])
 
+
+
+
+
+(defonce app-state
+  (reagent/atom
+   {:available-players all-players
+    :roster-composition roster-composition
+    :members-in-draft-order members-in-draft-order
+    :picked-players []}))
+
+;; Actions
+
+(defn pick-player [player]
+  (swap! app-state
+         (fn [state]
+           (update-in state [:picked-players] #(conj %1 player)))))
+
+
+;; Views
+
 (defn members-table []
-  (let [next-member-to-pick (next-member-to-pick)
-        picked-players (:picked-players @app-state)]
+  (let [state @app-state
+        next-member-to-pick (next-member-to-pick state)
+        picked-players (:picked-players state)]
     [:table.members-table
      [:th "Draft Selections"]
      (for [member members-in-draft-order]
@@ -62,13 +77,9 @@
           (if (= member me) "me" "opponent")
           (if (= member next-member-to-pick) " next-pick"))}
         [:th member]
-        (for [picked-player (picked-players-for-member member picked-players)]
+        (for [picked-player (picked-players-for-member member state)]
+          ^{:key (:name picked-player)}
           [:span (:name picked-player)])])]))
-
-(defn pick-player [player]
-  (swap! app-state
-         (fn [state]
-           (update-in state [:picked-players] #(conj %1 player)))))
 
 (defn players-table []
   [:table
@@ -90,6 +101,8 @@
     [members-table]]
    [:div.players
     [players-table]]])
+
+;; main
 
 (defn ^:export main []
   (reagent/render [page]
