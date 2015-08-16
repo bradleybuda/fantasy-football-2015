@@ -7,14 +7,14 @@
   (let [cells (html/select row [:td])
         [rank-player-position team bye posrank value] (map html/text cells)
         [_ rank player position] (re-matches #"^(\d+)\. ([^,]+), (.*)$" rank-player-position)]
-    {:rank rank
+    {:rank (read-string rank)
      :player player
      :position position
      :team team
-     :value value}))
+     :value (if (= "--" value) 0 (read-string (clojure.string/replace value "$" "")))}))
 
 (defn -main []
   (let [resource (html/html-resource (java.net.URL. page-to-scrape))
         table (second (html/select resource [:table.inline-table]))
         table-rows (html/select table [:tbody :tr])]
-    (println (map parse-table-row table-rows))))
+    (pr (map parse-table-row table-rows))))
