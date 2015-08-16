@@ -13,9 +13,7 @@
 ;; TODO should I be division-aware? Might be useful to penalize my
 ;; division opponents more
 
-
-;; TODO more consitent state handling - don't access it as a global
-(def me :bradley-buda)
+(def me "Bradley Buda")
 
 ;; zero-based
 (defn next-pick-index [app-state]
