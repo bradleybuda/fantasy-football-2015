@@ -19,7 +19,7 @@
   (let [resource (html/html-resource (java.net.URL. page-to-scrape))
         table (second (html/select resource [:table.inline-table]))
         table-rows (html/select table [:tbody :tr])
-        players (map parse-table-row table-rows)]
+        players (vec (map parse-table-row table-rows))]
 
     (with-open [wrtr (io/writer output-file)]
       (.write wrtr (prn-str '(ns fantasy-football-2015.generated.espn)))
