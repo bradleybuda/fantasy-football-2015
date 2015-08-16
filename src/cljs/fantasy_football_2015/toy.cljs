@@ -10,10 +10,3 @@
 ;; TODO update with proper order
 (def members-in-draft-order
   ["Larry Whalen" "David Baum" "Bradley Buda" "Blake Wilson"])
-
-;; TODO
-(def all-players
-  (repeatedly 80
-              (fn []
-                {:name (rand-int 1000000)
-                 :position (rand-nth (seq positions))})))

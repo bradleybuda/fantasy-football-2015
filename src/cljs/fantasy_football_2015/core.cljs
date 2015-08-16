@@ -1,10 +1,12 @@
 (ns fantasy-football-2015.core
   (:require [reagent.core :as reagent]
             [clojure.set :refer [difference]]
+            [fantasy-football-2015.generated.espn :refer [all-players]]
             [
              ;;fantasy-football-2015.bastards
              fantasy-football-2015.toy
-             :refer [roster-composition members-in-draft-order all-players]]))
+             :refer [roster-composition members-in-draft-order]
+             ]))
 
 (enable-console-print!)
 
@@ -95,8 +97,8 @@
        [:th "Player"]
        [:th "Position"]
        [:td]]
-      (for [[player-idx player] (map-indexed vector (unpicked-players state))]
-        ^{:key player-idx}
+      (for [player (reverse (sort-by :value (unpicked-players state)))]
+        ^{:key (:name player)}
         [:tr
          [:td (:name player)]
          [:td (:position player)]
