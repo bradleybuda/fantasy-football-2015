@@ -1,5 +1,6 @@
 (ns fantasy-football-2015.core
   (:require [reagent.core :as reagent]
+            [clojure.set :refer [difference]]
             [
              ;;fantasy-football-2015.bastards
              fantasy-football-2015.toy
@@ -32,6 +33,9 @@
          (filter (fn [[_ picking-member] _]
                    (= member picking-member))
                  picked-players-with-members))))
+
+(defn unpicked-players [app-state]
+  (difference (set all-players) (set (:picked-players app-state))))
 
 ;; (defn roster-for-member [member picked-players]
 ;;   (let [players-for-member (picked-players-for-member member pick-players)]
@@ -68,31 +72,35 @@
         next-member-to-pick (next-member-to-pick state)
         picked-players (:picked-players state)]
     [:table.members-table
-     [:th "Draft Selections"]
-     (for [member members-in-draft-order]
-       ^{:key member}
-       [:tr
-        {:class
-         (str
-          (if (= member me) "me" "opponent")
-          (if (= member next-member-to-pick) " next-pick"))}
-        [:th member]
-        (for [picked-player (picked-players-for-member member state)]
-          ^{:key (:name picked-player)}
-          [:span (:name picked-player)])])]))
+     [:tbody
+      [:th "Draft Selections"]
+      (for [member members-in-draft-order]
+        ^{:key member}
+        [:tr
+         {:class
+          (str
+           (if (= member me) "me" "opponent")
+           (if (= member next-member-to-pick) " next-pick"))}
+         [:th member]
+         [:td
+          (for [picked-player (picked-players-for-member member state)]
+            ^{:key (:name picked-player)}
+            [:span (:name picked-player)])]])]]))
 
 (defn players-table []
-  [:table
-   [:tr
-    [:th "Player"]
-    [:th "Position"]
-    [:td]]
-   (for [[player-idx player] (map-indexed vector all-players)]
-     ^{:key player-idx}
-     [:tr
-      [:td (:name player)]
-      [:td (:position player)]
-      [:td [:button {:on-click (partial pick-player player)} "Draft"]]])])
+  (let [state @app-state]
+    [:table
+     [:tbody
+      [:tr
+       [:th "Player"]
+       [:th "Position"]
+       [:td]]
+      (for [[player-idx player] (map-indexed vector (unpicked-players state))]
+        ^{:key player-idx}
+        [:tr
+         [:td (:name player)]
+         [:td (:position player)]
+         [:td [:button {:on-click (partial pick-player player)} "Draft"]]])]]))
 
 (defn page []
   [:div.page
