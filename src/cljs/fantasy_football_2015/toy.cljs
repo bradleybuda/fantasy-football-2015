@@ -1,7 +1,7 @@
 (ns fantasy-football-2015.toy
   (:require [clojure.set :refer [difference]]))
 
-(def roster-composition
+(def roster-slots
   ["QB" "RB" "RB" "WR" "TE" "Flex" "K" "Bench" "Bench"])
 
 (def positions

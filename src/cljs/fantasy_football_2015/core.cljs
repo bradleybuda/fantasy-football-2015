@@ -5,7 +5,7 @@
             [
              ;;fantasy-football-2015.bastards
              fantasy-football-2015.toy
-             :refer [roster-composition members-in-draft-order]
+             :refer [roster-slots members-in-draft-order]
              ]))
 
 (enable-console-print!)
@@ -37,23 +37,43 @@
 (defn unpicked-players [app-state]
   (difference (set all-players) (set (:picked-players app-state))))
 
-;; (defn roster-for-member [member picked-players]
-;;   (let [players-for-member (picked-players-for-member member pick-players)]
+(defn player-can-fill-roster-slot? [slot player]
+  (condp = slot
+    "Bench" true
+    "Flex" (contains? #{"RB" "WR" "TE"} (:position player))
+    (= slot (:position player))))
 
-;;     )
-;;   )
+(defn best-player-for-slot [slot players]
+  (let [eligible-players (filter (partial player-can-fill-roster-slot? slot) players)]
+    (apply max-key :value eligible-players)))
 
-;; (defn remaining-roster-for-member
-;;   [member remaining-players remaining-roster-composition])
+;; TODO overload instead of different fn name?
+;; TODO destructuring?
+(defn roster-from-players-recursive [roster-construction]
+  (if (empty? (:open-slots roster-construction))
+    (:roster roster-construction)
+
+    (let [[slot & remaining-slots] (:open-slots roster-construction)
+          eligible-players (:unassigned-players roster-construction)
+          player-for-slot (best-player-for-slot slot eligible-players)
+          unassigned-players (disj eligible-players player-for-slot)]
+      (roster-from-players-recursive
+       {:roster (conj (:roster roster-construction) player-for-slot)
+        :open-slots remaining-slots
+        :unassigned-players unassigned-players}))))
 
 
+(defn roster-from-players [players]
+  (roster-from-players-recursive
+   {:roster []
+    :open-slots roster-slots
+    :unassigned-players (set players)}))
 
 
 
 (defonce app-state
   (reagent/atom
    {:available-players all-players
-    :roster-composition roster-composition
     :members-in-draft-order members-in-draft-order
     :picked-players []}))
 
@@ -83,9 +103,7 @@
            (if (= member next-member-to-pick) " next-pick"))}
          [:th member]
          [:td
-          (for [picked-player (picked-players-for-member member state)]
-            ^{:key (:name picked-player)}
-            [:span (:name picked-player)])]])]]))
+          (pr-str (roster-from-players (picked-players-for-member member state)))]])]]))
 
 (defn players-table []
   (let [state @app-state]
