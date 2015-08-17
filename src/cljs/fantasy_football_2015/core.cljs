@@ -102,8 +102,9 @@
            (if (= member me) "me" "opponent")
            (if (= member next-member-to-pick) " next-pick"))}
          [:th member]
-         [:td
-          (pr-str (roster-from-players (picked-players-for-member member state)))]])]]))
+         (for [player (roster-from-players (picked-players-for-member member state))]
+           ^{:key (:name player)} ;; TODO handle nil
+           [:td (:name player)])])]]))
 
 (defn players-table []
   (let [state @app-state]
