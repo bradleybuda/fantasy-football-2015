@@ -48,19 +48,15 @@
     (apply max-key :value eligible-players)))
 
 ;; TODO overload instead of different fn name?
-;; TODO destructuring?
-(defn roster-from-players-recursive [roster-construction]
-  (if (empty? (:open-slots roster-construction))
-    (:roster roster-construction)
-
-    (let [[slot & remaining-slots] (:open-slots roster-construction)
-          eligible-players (:unassigned-players roster-construction)
-          player-for-slot (best-player-for-slot slot eligible-players)
-          unassigned-players (disj eligible-players player-for-slot)]
+(defn roster-from-players-recursive [{:keys [roster open-slots unassigned-players]}]
+  (if (empty? open-slots)
+    roster
+    (let [[slot & remaining-slots] open-slots
+          player-for-slot (best-player-for-slot slot unassigned-players)]
       (roster-from-players-recursive
-       {:roster (conj (:roster roster-construction) player-for-slot)
+       {:roster (conj roster player-for-slot)
         :open-slots remaining-slots
-        :unassigned-players unassigned-players}))))
+        :unassigned-players (disj unassigned-players player-for-slot)}))))
 
 
 (defn roster-from-players [players]
@@ -92,8 +88,12 @@
         next-member-to-pick (next-member-to-pick state)
         picked-players (:picked-players state)]
     [:table.members-table
+     [:thead
+      [:tr
+       [:th "Member"]
+       (for [slot roster-slots]
+         [:th slot])]]
      [:tbody
-      [:th "Draft Selections"]
       (for [member members-in-draft-order]
         ^{:key member}
         [:tr
@@ -104,7 +104,7 @@
          [:th member]
          (for [player (roster-from-players (picked-players-for-member member state))]
            ^{:key (:name player)} ;; TODO handle nil
-           [:td (:name player)])])]]))
+           [:td (or (:name player) [:i "empty"])])])]]))
 
 (defn players-table []
   (let [state @app-state]
