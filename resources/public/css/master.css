@@ -8,10 +8,10 @@ body {
   justify-content: space-between;
 }
 
-.members-table .me {
-  background-color: lightblue;
+.members-table .me th:before {
+  content: '\BB';
 }
 
-.members-table .next-pick th:before {
-  content: '\BB';
+.members-table .next-pick {
+  background-color: lightblue;
 }

@@ -109,12 +109,16 @@
       [:tr
        [:th "Player"]
        [:th "Position"]
+       [:th "Rank"]
+       [:th "Value"]
        [:td]]
       (for [player (reverse (sort-by :value (unpicked-players state)))]
         ^{:key (:name player)}
         [:tr
          [:td (:name player)]
          [:td (:position player)]
+         [:td (:rank player)]
+         [:td (:value player)]
          [:td [:button {:on-click (partial pick-player player)} "Draft"]]])]]))
 
 (defn page []
