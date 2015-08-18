@@ -47,21 +47,17 @@
   (let [eligible-players (filter (partial player-can-fill-roster-slot? slot) players)]
     (apply max-key :value eligible-players)))
 
-(defn- roster-from-players-recursive [{:keys [roster open-slots unassigned-players]}]
-  (if (empty? open-slots)
-    roster
-    (let [[slot & remaining-slots] open-slots
-          player-for-slot (best-player-for-slot slot unassigned-players)]
-      (roster-from-players-recursive
-       {:roster (conj roster player-for-slot)
-        :open-slots remaining-slots
-        :unassigned-players (disj unassigned-players player-for-slot)}))))
-
-(defn roster-from-players [players]
-  (roster-from-players-recursive
-   {:roster []
-    :open-slots roster-slots
-    :unassigned-players (set players)}))
+(defn roster-from-players
+  ([players] (roster-from-players (set players) [] roster-slots))
+  ([unassigned-players roster-so-far remaining-slots]
+   (if (empty? remaining-slots)
+     roster-so-far
+     (let [[slot & remaining-slots] remaining-slots
+           player-for-slot (best-player-for-slot slot unassigned-players)]
+       (recur
+        (disj unassigned-players player-for-slot)
+        (conj roster-so-far player-for-slot)
+        remaining-slots)))))
 
 (defonce app-state
   (reagent/atom
