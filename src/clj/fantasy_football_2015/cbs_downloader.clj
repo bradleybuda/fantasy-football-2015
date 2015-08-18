@@ -18,10 +18,11 @@
   (let [[rank-cell name-cell] (html/select row [:td])
         posrank (html/text rank-cell)
         name (html/text (first (html/select name-cell [:a])))
-        [_ value] (re-find #" \$(\d+) " (html/text name-cell))]
+        [_ value] (re-find #" \$(\d+) " (html/text name-cell))
+        [_ team] (re-find #"\W([A-Z]{2,3})\W" (html/text name-cell))]
     {:name (clojure.string/trim name)
      :position (translate-position position)
-     ;; TODO team
+     :team (if (= team "III") "WAS" team) ;; RG3 hack
      :posrank (read-string posrank)
      :value (if value (read-string value) 0)}))
 
