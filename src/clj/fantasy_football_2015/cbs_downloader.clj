@@ -5,12 +5,23 @@
 (def page-to-scrape "http://fantasynews.cbssports.com/fantasyfootball/rankings/yearly/ppr")
 (def output-file "src/cljs/fantasy_football_2015/generated/cbs.cljs")
 
-(defn- parse-player-row [row]
+(defn- translate-position [position]
+  (condp = position
+    "Quarterbacks" "QB"
+    "Running Backs" "RB"
+    "Wide Receivers" "WR"
+    "Tight Ends" "TE"
+    "Kickers" "K"
+    "Defensive Special Teams" "DST"))
+
+(defn- parse-player-row [row position]
   (let [[rank-cell name-cell] (html/select row [:td])
         posrank (html/text rank-cell)
         name (html/text (first (html/select name-cell [:a])))
         [_ value] (re-find #" \$(\d+) " (html/text name-cell))]
-    {:name name
+    {:name (clojure.string/trim name)
+     :position (translate-position position)
+     ;; TODO team
      :posrank (read-string posrank)
      :value (if value (read-string value) 0)}))
 
@@ -23,8 +34,7 @@
        (if (= "title" (:class (:attrs row)))
          (recur remaining-rows (html/text row) players)
          (recur remaining-rows current-position
-                (conj players (assoc (parse-player-row row)
-                                     :position current-position))))))))
+                (conj players (parse-player-row row current-position))))))))
 
 (defn -main []
   (let [resource (html/html-resource (java.net.URL. page-to-scrape))
