@@ -9,10 +9,11 @@
   (let [cells (html/select row [:td])
         [rank-name-position team bye posrank value] (map html/text cells)
         [_ rank name position] (re-matches #"^(\d+)\. ([^,]+), (.*)$" rank-name-position)]
-    {:rank (read-string rank)
-     :name name
+    {:name name
      :position position
      :team team
+     :rank (read-string rank)
+     :posrank (read-string (second (re-find #"(\d+)" posrank)))
      :value (if (= "--" value) 0 (read-string (clojure.string/replace value "$" "")))}))
 
 (defn -main []
