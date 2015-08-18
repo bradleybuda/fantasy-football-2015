@@ -8,5 +8,6 @@
   (difference (set roster-composition) #{"Flex" "Bench"}))
 
 ;; TODO update with proper order
+;; Is this it? http://games.espn.go.com/ffl/tools/draftorder?leagueId=654210
 (def members-in-draft-order
   ["Larry Whalen" "David Baum" "Bradley Buda" "Blake Wilson"])
