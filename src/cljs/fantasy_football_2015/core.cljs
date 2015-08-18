@@ -1,7 +1,7 @@
 (ns fantasy-football-2015.core
   (:require [reagent.core :as reagent]
             [clojure.set :refer [difference]]
-            [fantasy-football-2015.generated.espn :refer [all-players]]
+            [fantasy-football-2015.generated.cbs :refer [all-players]]
             [
              ;;fantasy-football-2015.bastards
              fantasy-football-2015.toy
@@ -104,16 +104,20 @@
      [:tbody
       [:tr
        [:th "Player"]
+       [:th "Team"]
        [:th "Position"]
        [:th "Rank"]
+       [:th "PosRank"]
        [:th "Value"]
        [:td]]
       (for [player (reverse (sort-by :value (unpicked-players state)))]
         ^{:key (:name player)}
         [:tr
          [:td (:name player)]
+         [:td (:team player)]
          [:td (:position player)]
          [:td (:rank player)]
+         [:td (:posrank player)]
          [:td (:value player)]
          [:td [:button {:on-click (partial pick-player player)} "Draft"]]])]]))
 

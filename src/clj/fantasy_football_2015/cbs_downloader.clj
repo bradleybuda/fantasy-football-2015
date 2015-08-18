@@ -40,5 +40,9 @@
 (defn -main []
   (let [resource (html/html-resource (java.net.URL. page-to-scrape))
         table (first (html/select resource [:table.data]))
-        table-rows (html/select table [:tr])]
-    (prn (parse-table-rows table-rows))))
+        table-rows (html/select table [:tr])
+        players (parse-table-rows table-rows)]
+
+    (with-open [wrtr (io/writer output-file)]
+      (.write wrtr (prn-str '(ns fantasy-football-2015.generated.cbs)))
+      (.write wrtr (prn-str `(def ~'all-players ~players))))))
