@@ -47,8 +47,7 @@
   (let [eligible-players (filter (partial player-can-fill-roster-slot? slot) players)]
     (apply max-key :value eligible-players)))
 
-;; TODO overload instead of different fn name?
-(defn roster-from-players-recursive [{:keys [roster open-slots unassigned-players]}]
+(defn- roster-from-players-recursive [{:keys [roster open-slots unassigned-players]}]
   (if (empty? open-slots)
     roster
     (let [[slot & remaining-slots] open-slots
@@ -58,14 +57,11 @@
         :open-slots remaining-slots
         :unassigned-players (disj unassigned-players player-for-slot)}))))
 
-
 (defn roster-from-players [players]
   (roster-from-players-recursive
    {:roster []
     :open-slots roster-slots
     :unassigned-players (set players)}))
-
-
 
 (defonce app-state
   (reagent/atom
@@ -85,13 +81,13 @@
 
 (defn members-table []
   (let [state @app-state
-        next-member-to-pick (next-member-to-pick state)
-        picked-players (:picked-players state)]
+        next-member-to-pick (next-member-to-pick state)]
     [:table.members-table
      [:thead
       [:tr
        [:th "Member"]
-       (for [slot roster-slots]
+       (for [[slot-index slot] (map-indexed vector roster-slots)]
+         ^{:key slot-index}
          [:th slot])]]
      [:tbody
       (for [member members-in-draft-order]
@@ -102,8 +98,8 @@
            (if (= member me) "me" "opponent")
            (if (= member next-member-to-pick) " next-pick"))}
          [:th member]
-         (for [player (roster-from-players (picked-players-for-member member state))]
-           ^{:key (:name player)} ;; TODO handle nil
+         (for [[roster-index player] (map-indexed vector (roster-from-players (picked-players-for-member member state)))]
+           ^{:key roster-index}
            [:td (or (:name player) [:i "empty"])])])]]))
 
 (defn players-table []
