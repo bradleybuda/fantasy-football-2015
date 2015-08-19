@@ -13,7 +13,8 @@
 
 ;; Wishlist
 
-;; Show multiple ratings per player
+;; Reduce merge failures (defenses, Odell Beckham Jr, others?)
+;; Make merge a full union - include missing on both sides
 ;; Normalize ratings
 ;; Aggregate ratings
 ;; Show team rating so far
@@ -30,15 +31,23 @@
          merged-players []]
     (let [[cbs-player & remaining-cbs-players] (seq cbs-players)]
       (if (nil? cbs-player)
-        ;; TODO warn about remaining espn players
-        merged-players
+        ;; We've consumed all the CBS players, add in the ESPN players
+        ;; (warning as we go)
+        (concat merged-players (map (fn [espn-player]
+                                    (println (str "no matching cbs player for " (pr-str espn-player)))
+                                    (assoc (select-keys espn-player [:name :position :team])
+                                           :espn (:value espn-player)
+                                           :cbs nil))
+                              espn-players))
 
         (let [espn-player (first (filter #(= (:name cbs-player) (:name %1)) espn-players))]
-
           (if (nil? espn-player)
-            (println (str "no matching espn player for " (pr-str cbs-player)))
-            (println (pr-str espn-player)))
-          (recur remaining-cbs-players (disj espn-players espn-player) (conj merged-players (assoc cbs-player :espn (or espn-player {})))))))))
+            (println (str "no matching espn player for " (pr-str cbs-player))))
+          (recur remaining-cbs-players
+                 (disj espn-players espn-player)
+                 (conj merged-players (assoc (select-keys cbs-player [:name :position :team])
+                                             :espn (:value espn-player)
+                                             :cbs  (:value cbs-player)))))))))
 
 
 (def me "Bradley Buda")
@@ -142,8 +151,8 @@
          [:td (:name player)]
          [:td (:team player)]
          [:td (:position player)]
-         [:td (:value player)]
-         [:td (:value (:espn player))]
+         [:td (:cbs player)]
+         [:td (:espn player)]
          [:td [:button {:on-click (partial pick-player player)} "Draft"]]])]]))
 
 (defn page []
