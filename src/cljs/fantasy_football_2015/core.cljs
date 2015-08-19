@@ -1,7 +1,8 @@
 (ns fantasy-football-2015.core
   (:require [reagent.core :as reagent]
             [clojure.set :refer [difference]]
-            [fantasy-football-2015.generated.cbs :refer [all-players]]
+            [fantasy-football-2015.generated.cbs]
+            [fantasy-football-2015.generated.espn]
             [
              ;;fantasy-football-2015.bastards
              fantasy-football-2015.toy
@@ -20,6 +21,25 @@
 ;; Show delta team ratings against others
 ;; Weight delta ratings by actual matchups (want to win against people I'm playing)
 ;; Weight earlier matchups heavier
+;; Navigate away warning if any picks made
+;; Undo pick
+
+(def all-players
+  (loop [cbs-players (set fantasy-football-2015.generated.cbs/all-players)
+         espn-players (set fantasy-football-2015.generated.espn/all-players)
+         merged-players []]
+    (let [[cbs-player & remaining-cbs-players] (seq cbs-players)]
+      (if (nil? cbs-player)
+        ;; TODO warn about remaining espn players
+        merged-players
+
+        (let [espn-player (first (filter #(= (:name cbs-player) (:name %1)) espn-players))]
+
+          (if (nil? espn-player)
+            (println (str "no matching espn player for " (pr-str cbs-player)))
+            (println (pr-str espn-player)))
+          (recur remaining-cbs-players (disj espn-players espn-player) (conj merged-players (assoc cbs-player :espn (or espn-player {})))))))))
+
 
 (def me "Bradley Buda")
 
@@ -113,9 +133,8 @@
        [:th "Player"]
        [:th "Team"]
        [:th "Position"]
-       [:th "Rank"]
-       [:th "PosRank"]
-       [:th "Value"]
+       [:th "CBS Value"]
+       [:th "ESPN Value"]
        [:td]]
       (for [player (reverse (sort-by :value (unpicked-players state)))]
         ^{:key (:name player)}
@@ -123,9 +142,8 @@
          [:td (:name player)]
          [:td (:team player)]
          [:td (:position player)]
-         [:td (:rank player)]
-         [:td (:posrank player)]
          [:td (:value player)]
+         [:td (:value (:espn player))]
          [:td [:button {:on-click (partial pick-player player)} "Draft"]]])]]))
 
 (defn page []
