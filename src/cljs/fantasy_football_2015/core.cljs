@@ -10,18 +10,25 @@
 
 (enable-console-print!)
 
-;; TODO should I be division-aware? Might be useful to penalize my
-;; division opponents more
+;; Wishlist
+
+;; Show multiple ratings per player
+;; Normalize ratings
+;; Aggregate ratings
+;; Show team rating so far
+;; Show best possible team rating
+;; Show delta team ratings against others
+;; Weight delta ratings by actual matchups (want to win against people I'm playing)
+;; Weight earlier matchups heavier
 
 (def me "Bradley Buda")
 
 ;; zero-based
-(defn next-pick-index [app-state]
-  (count (:picked-players app-state)))
+(defn next-pick-index [{:keys [picked-players]}]
+  (count picked-players))
 
-(defn snake-pick-sequence [app-state]
-  (let [draft-order (:members-in-draft-order app-state)]
-    (cycle (concat draft-order (reverse draft-order)))))
+(defn snake-pick-sequence [{:keys [members-in-draft-order]}]
+  (cycle (concat members-in-draft-order (reverse members-in-draft-order))))
 
 (defn next-member-to-pick [app-state]
   (nth (snake-pick-sequence app-state) (next-pick-index app-state)))
@@ -34,8 +41,8 @@
                    (= member picking-member))
                  picked-players-with-members))))
 
-(defn unpicked-players [app-state]
-  (difference (set all-players) (set (:picked-players app-state))))
+(defn unpicked-players [{:keys [picked-players]}]
+  (difference (set all-players) (set picked-players)))
 
 (defn player-can-fill-roster-slot? [slot player]
   (condp = slot
