@@ -25,7 +25,7 @@
 ;; Navigate away warning if any picks made
 ;; Undo pick
 
-(def all-players
+(def merged-players
   (loop [cbs-players (set fantasy-football-2015.generated.cbs/all-players)
          espn-players (set fantasy-football-2015.generated.espn/all-players)
          merged-players []]
@@ -49,6 +49,18 @@
                                              :espn (:value espn-player)
                                              :cbs  (:value cbs-player)))))))))
 
+
+;; Normalizes player ratings according to max
+(def all-players
+  (let [sources [:cbs :espn]
+        maxes (map #(apply max (map %1 merged-players)) sources)]
+    (prn (map vector sources maxes))
+    (map (fn [player]
+           (reduce (fn [p [source source-max] _]
+                     (update p source (fn [value]
+                                             (/ (or value 0) source-max))))
+            player (map vector sources maxes)))
+         merged-players)))
 
 (def me "Bradley Buda")
 
@@ -145,14 +157,14 @@
        [:th "CBS Value"]
        [:th "ESPN Value"]
        [:td]]
-      (for [player (reverse (sort-by :value (unpicked-players state)))]
+      (for [player (reverse (sort-by #(min (:espn %1) (:cbs %1)) (unpicked-players state)))]
         ^{:key (:name player)}
         [:tr
          [:td (:name player)]
          [:td (:team player)]
          [:td (:position player)]
-         [:td (:cbs player)]
-         [:td (:espn player)]
+         [:td (int (* 100  (:cbs player)))]
+         [:td (int (* 100 (:espn player)))]
          [:td [:button {:on-click (partial pick-player player)} "Draft"]]])]]))
 
 (defn page []
