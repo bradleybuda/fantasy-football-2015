@@ -14,9 +14,7 @@
 ;; Wishlist
 
 ;; Reduce merge failures (defenses, Odell Beckham Jr, others?)
-;; Make merge a full union - include missing on both sides
-;; Normalize ratings
-;; Aggregate ratings
+;; Better rating aggregation fn (mean of squares?)
 ;; Show team rating so far
 ;; Show best possible team rating
 ;; Show delta team ratings against others
