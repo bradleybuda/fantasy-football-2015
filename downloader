@@ -1,0 +1,5 @@
+#!/bin/sh
+
+lein run -m fantasy-football-2015.cbs-downloader
+lein run -m fantasy-football-2015.espn-downloader
+lein run -m fantasy-football-2015.yahoo-downloader
