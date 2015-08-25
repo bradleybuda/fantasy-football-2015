@@ -3,6 +3,7 @@
             [clojure.set :refer [difference]]
             [fantasy-football-2015.generated.cbs]
             [fantasy-football-2015.generated.espn]
+            [fantasy-football-2015.generated.yahoo]
             [
              ;;fantasy-football-2015.bastards
              fantasy-football-2015.toy
@@ -13,6 +14,7 @@
 
 ;; Wishlist
 
+;; Merge thirds source (Yahoo), probably needs rewrite
 ;; Reduce merge failures (defenses, Odell Beckham Jr, others?)
 ;; Better rating aggregation fn (mean of squares?)
 ;; Show team rating so far
@@ -23,42 +25,32 @@
 ;; Navigate away warning if any picks made
 ;; Undo pick
 
-(def merged-players
-  (loop [cbs-players (set fantasy-football-2015.generated.cbs/all-players)
-         espn-players (set fantasy-football-2015.generated.espn/all-players)
-         merged-players []]
-    (let [[cbs-player & remaining-cbs-players] (seq cbs-players)]
-      (if (nil? cbs-player)
-        ;; We've consumed all the CBS players, add in the ESPN players
-        ;; (warning as we go)
-        (concat merged-players (map (fn [espn-player]
-                                    (println (str "no matching cbs player for " (pr-str espn-player)))
-                                    (assoc (select-keys espn-player [:name :position :team])
-                                           :espn (:value espn-player)
-                                           :cbs nil))
-                              espn-players))
+;; TODO more clojure-y way to do this?
 
-        (let [espn-player (first (filter #(= (:name cbs-player) (:name %1)) espn-players))]
-          (if (nil? espn-player)
-            (println (str "no matching espn player for " (pr-str cbs-player))))
-          (recur remaining-cbs-players
-                 (disj espn-players espn-player)
-                 (conj merged-players (assoc (select-keys cbs-player [:name :position :team])
-                                             :espn (:value espn-player)
-                                             :cbs  (:value cbs-player)))))))))
+(def player-lists
+  {:cbs fantasy-football-2015.generated.cbs/all-players
+   :espn fantasy-football-2015.generated.espn/all-players
+   :yahoo fantasy-football-2015.generated.espn/all-players})
 
+(def data-sources (keys player-lists))
 
-;; Normalizes player ratings according to max
-(def all-players
-  (let [sources [:cbs :espn]
-        maxes (map #(apply max (map %1 merged-players)) sources)]
-    (prn (map vector sources maxes))
-    (map (fn [player]
-           (reduce (fn [p [source source-max] _]
-                     (update p source (fn [value]
-                                             (/ (or value 0) source-max))))
-            player (map vector sources maxes)))
-         merged-players)))
+(defn all-player-names []
+  (set (map :name (flatten (vals player-lists)))))
+
+;; Can return nil
+;; TODO fuzzy match
+(defn find-player-by-name [name player-list]
+  (first (filter #(= name (:name %1)) player-list)))
+
+(defn build-player-by-name [player-name]
+  (let [matcher-fn (partial find-player-by-name player-name)
+        matching-players (reduce (fn [h [data-source player-list]] (assoc h data-source (matcher-fn player-list))) {} player-lists)]
+    {:name player-name :matching-players matching-players}))
+
+(defn build-player-list []
+  (map build-player-by-name (all-player-names)))
+
+(prn (build-player-list))
 
 (def me "Bradley Buda")
 
@@ -80,7 +72,7 @@
                    (= member picking-member))
                  picked-players-with-members))))
 
-(defn unpicked-players [{:keys [picked-players]}]
+(defn unpicked-players [{:keys [picked-players all-players]}]
   (difference (set all-players) (set picked-players)))
 
 (defn player-can-fill-roster-slot? [slot player]
@@ -106,10 +98,12 @@
         remaining-slots)))))
 
 (defonce app-state
-  (reagent/atom
-   {:available-players all-players
-    :members-in-draft-order members-in-draft-order
-    :picked-players []}))
+  (let [players (build-player-list)]
+    (reagent/atom
+     {:all-players players
+      :available-players players
+      :members-in-draft-order members-in-draft-order
+      :picked-players []})))
 
 ;; Actions
 
