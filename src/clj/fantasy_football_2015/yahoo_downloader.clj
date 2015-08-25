@@ -17,13 +17,15 @@
      :value value}))
 
 (defn -main []
-  (let [players (mapcat (fn [offset]
-                          (let [url (str url-template offset)
-                                resource (html/html-resource (java.net.URL. url))
-                                table (html/select resource [:table#draftanalysistable])
-                                table-rows (html/select table [:tbody :tr])]
-                            (map parse-table-row table-rows)))
-                        (range 0 300 50))]
+  (let [players (vec
+                 (mapcat
+                  (fn [offset]
+                    (let [url (str url-template offset)
+                          resource (html/html-resource (java.net.URL. url))
+                          table (html/select resource [:table#draftanalysistable])
+                          table-rows (html/select table [:tbody :tr])]
+                      (map parse-table-row table-rows)))
+                  (range 0 300 50)))]
 
     (with-open [wrtr (io/writer output-file)]
       (.write wrtr (prn-str '(ns fantasy-football-2015.generated.yahoo)))
