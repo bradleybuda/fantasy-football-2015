@@ -42,10 +42,29 @@
 (defn find-player-by-name [name player-list]
   (first (filter #(= name (:name %1)) player-list)))
 
+(defn map-hash-map [f hash]
+  (reduce (fn [updated-hash [k v]]
+            (assoc updated-hash k (f k v))) {} hash))
+
+(defn find-matching-players [player-name]
+  (map-hash-map
+   (fn [_ player-list]
+     (find-player-by-name player-name player-list))
+   player-lists))
+
+(defn extract-single-value [player-name matching-players key]
+  (let [matching-player-vals (vals matching-players)
+        values (map key matching-player-vals)
+        uniq-values (set (remove nil? values))]
+    (if (> (count uniq-values) 1)
+      (println (str "found multiple " key " for " player-name)))
+    (first uniq-values)))
+
 (defn build-player-by-name [player-name]
-  (let [matcher-fn (partial find-player-by-name player-name)
-        matching-players (reduce (fn [h [data-source player-list]] (assoc h data-source (matcher-fn player-list))) {} player-lists)]
-    {:name player-name :matching-players matching-players}))
+  (let [matching-players (find-matching-players player-name)]
+    {:name player-name
+     :position (extract-single-value player-name matching-players :position)
+     :team (extract-single-value player-name matching-players :team)}))
 
 (defn build-player-list []
   (map build-player-by-name (all-player-names)))
