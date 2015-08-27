@@ -64,7 +64,8 @@
   (let [matching-players (find-matching-players player-name)]
     {:name player-name
      :position (extract-single-value player-name matching-players :position)
-     :team (extract-single-value player-name matching-players :team)}))
+     :team (extract-single-value player-name matching-players :team)
+     :values (map :value (vals matching-players))}))
 
 (defn build-player-list []
   (map build-player-by-name (all-player-names)))
@@ -165,8 +166,7 @@
        [:th "Player"]
        [:th "Team"]
        [:th "Position"]
-       [:th "CBS Value"]
-       [:th "ESPN Value"]
+       [:th "Values"]
        [:td]]
       (for [player (reverse (sort-by #(min (:espn %1) (:cbs %1)) (unpicked-players state)))]
         ^{:key (:name player)}
@@ -174,8 +174,7 @@
          [:td (:name player)]
          [:td (:team player)]
          [:td (:position player)]
-         [:td (int (* 100  (:cbs player)))]
-         [:td (int (* 100 (:espn player)))]
+         [:td (pr-str (:values player))]
          [:td [:button {:on-click (partial pick-player player)} "Draft"]]])]]))
 
 (defn page []
