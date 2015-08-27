@@ -9,7 +9,7 @@
   (let [cells (html/select row [:td])
         [rank-name-position team bye posrank value] (map html/text cells)
         [_ rank name position] (re-matches #"^(\d+)\. ([^,]+), (.*)$" rank-name-position)]
-    {:name name
+    {:name (if (= "DST" position) team name)
      :position position
      :team team
      :rank (read-string rank)

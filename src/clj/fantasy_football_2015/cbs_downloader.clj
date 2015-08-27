@@ -5,23 +5,23 @@
 (def page-to-scrape "http://fantasynews.cbssports.com/fantasyfootball/rankings/yearly/ppr")
 (def output-file "src/cljs/fantasy_football_2015/generated/cbs.cljs")
 
-(defn- translate-position [position]
-  (condp = position
-    "Quarterbacks" "QB"
-    "Running Backs" "RB"
-    "Wide Receivers" "WR"
-    "Tight Ends" "TE"
-    "Kickers" "K"
-    "Defensive Special Teams" "DST"))
+(def translate-position
+  {"Quarterbacks" "QB"
+   "Running Backs" "RB"
+   "Wide Receivers" "WR"
+   "Tight Ends" "TE"
+   "Kickers" "K"
+   "Defensive Special Teams" "DST"})
 
-(defn- parse-player-row [row position]
-  (let [[rank-cell name-cell] (html/select row [:td])
+(defn- parse-player-row [row position-s]
+  (let [position (translate-position position-s)
+        [rank-cell name-cell] (html/select row [:td])
         posrank (html/text rank-cell)
-        name (html/text (first (html/select name-cell [:a])))
+        name (clojure.string/trim (html/text (first (html/select name-cell [:a]))))
         [_ value] (re-find #" \$(\d+) " (html/text name-cell))
         [_ team] (re-find #"\W([A-Z]{2,3})\W" (html/text name-cell))]
-    {:name (clojure.string/trim name)
-     :position (translate-position position)
+    {:name (if (= "DST" position) team name)
+     :position position
      :team (if (= team "III") "WAS" team) ;; RG3 hack
      :posrank (read-string posrank)
      :value (if value (read-string value) 0)}))
