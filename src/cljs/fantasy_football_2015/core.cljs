@@ -30,7 +30,7 @@
 (def player-lists
   {:cbs fantasy-football-2015.generated.cbs/all-players
    :espn fantasy-football-2015.generated.espn/all-players
-   :yahoo fantasy-football-2015.generated.espn/all-players})
+   :yahoo fantasy-football-2015.generated.yahoo/all-players})
 
 (def data-sources (keys player-lists))
 
