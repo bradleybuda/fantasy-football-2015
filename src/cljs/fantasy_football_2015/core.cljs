@@ -67,10 +67,19 @@
      :team (extract-single-value player-name matching-players :team)
      :values (map :value (vals matching-players))}))
 
-(defn build-player-list []
-  (map build-player-by-name (all-player-names)))
+(defn normalize-player-values [max-values player]
+  (update-in player [:values]
+             (fn [values]
+               (map (fn [[value max-value]]
+                      (/ value max-value))
+                    (map vector values max-values)))))
 
-(prn (build-player-list))
+(defn build-player-list []
+  (let [player-list (map build-player-by-name (all-player-names))
+        all-values (map :values player-list)
+        columnar-values (apply map vector all-values)
+        max-values (map #(apply max %1) columnar-values)]
+    (map (partial normalize-player-values max-values) player-list)))
 
 (def me "Bradley Buda")
 
