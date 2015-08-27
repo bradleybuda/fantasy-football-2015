@@ -10,7 +10,9 @@
         name (html/text (first (html/select name-team-position-cell [:.name])))
         team-position (first (html/select name-team-position-cell [:.Fz-xxs]))
         [_ team position] (re-matches #"^([^ ]{2,3}) - ([^ ]+)$" (html/text team-position))
-        value (read-string (clojure.string/replace (html/text avg-cost-cell) "$" ""))]
+        value-str (clojure.string/replace (html/text avg-cost-cell) "$" "")
+        value (if (= "-" value-str) 0 (read-string value-str))]
+
     {:name name
      :position position
      :team team
