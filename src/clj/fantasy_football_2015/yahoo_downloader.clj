@@ -9,7 +9,8 @@
   (let [[name-team-position-cell _ avg-cost-cell _] (html/select row [:td])
         name (html/text (first (html/select name-team-position-cell [:.name])))
         team-position (first (html/select name-team-position-cell [:.Fz-xxs]))
-        [_ team position] (re-matches #"^([^ ]{2,3}) - ([^ ]+)$" (html/text team-position))
+        [_ team-s position] (re-matches #"^([^ ]{2,3}) - ([^ ]+)$" (html/text team-position))
+        team (if (= team-s "Jax") "JAC" (clojure.string/upper-case team-s))
         value-str (clojure.string/replace (html/text avg-cost-cell) "$" "")
         value (if (= "-" value-str) 0 (read-string value-str))]
 
