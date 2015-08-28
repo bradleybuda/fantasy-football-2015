@@ -46,11 +46,11 @@
 (defn normalize-player-values [max-values player]
   (update-in player [:values]
              (fn [values]
-               (map (fn [[value max-value]]
-                      (if (nil? value)
-                        0
-                        (int (* 100 (/ value max-value)))))
-                    (map vector values max-values)))))
+               (apply vector (map (fn [[value max-value]]
+                              (if (nil? value)
+                                0
+                                (/ value max-value)))
+                            (map vector values max-values))))))
 
 (defn build-player-list []
   (let [player-list (map build-player-by-name (all-player-names))
