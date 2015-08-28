@@ -13,7 +13,7 @@
         team (if (= team-s "Jax") "JAC" (clojure.string/upper-case team-s))
         position (if (= position-s "DEF") "DST" position-s)
         value-str (clojure.string/replace (html/text avg-cost-cell) "$" "")
-        value (if (= "-" value-str) 0 (read-string value-str))]
+        value (if (= "-" value-str) 0 (/ (int (* 10 (read-string value-str))) 10))]
 
     {:name (if (= "DST" position) team name)
      :position position
