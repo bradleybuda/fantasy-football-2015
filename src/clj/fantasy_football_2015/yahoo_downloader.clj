@@ -3,7 +3,7 @@
             [clojure.java.io :as io]))
 
 (def url-template "https://football.fantasysports.yahoo.com/f1/draftanalysis?tab=AD&pos=ALL&sort=DA_AP&count=")
-(def output-file "src/cljs/fantasy_football_2015/generated/yahoo.cljs")
+(def output-file "src/clj/fantasy_football_2015/generated/yahoo.clj")
 
 (defn parse-table-row [row]
   (let [[name-team-position-cell _ avg-cost-cell _] (html/select row [:td])

@@ -3,7 +3,7 @@
             [clojure.java.io :as io]))
 
 (def page-to-scrape "http://espn.go.com/fantasy/football/story/_/id/12866396/top-300-rankings-2015")
-(def output-file "src/cljs/fantasy_football_2015/generated/espn.cljs")
+(def output-file "src/clj/fantasy_football_2015/generated/espn.clj")
 
 (defn parse-table-row [row]
   (let [cells (html/select row [:td])

@@ -3,7 +3,7 @@
             [clojure.java.io :as io]))
 
 (def page-to-scrape "http://fantasynews.cbssports.com/fantasyfootball/rankings/yearly/ppr")
-(def output-file "src/cljs/fantasy_football_2015/generated/cbs.cljs")
+(def output-file "src/clj/fantasy_football_2015/generated/cbs.clj")
 
 (def translate-position
   {"Quarterbacks" "QB"
