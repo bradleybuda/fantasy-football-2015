@@ -2,7 +2,8 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "0.0-3211"]
                  [reagent "0.5.0"]
-                 [enlive "1.1.6"]]
+                 [enlive "1.1.6"]
+                 [net.mikera/core.matrix "0.37.0"]]
 
   :source-paths ["src/clj"]
 
@@ -22,9 +23,7 @@
                         :compiler {:main fantasy-football-2015.core
                                    :output-to "resources/public/js/compiled/app.js"
                                    :output-dir "resources/public/js/compiled/out"
-                                   :asset-path "js/compiled/out"
-                                   :source-map true
-                                   :source-map-timestamp true}}
+                                   :asset-path "js/compiled/out"}}
 
                        {:id "min"
                         :source-paths ["src/cljs"]
