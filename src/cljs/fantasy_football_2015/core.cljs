@@ -69,6 +69,11 @@
         (conj roster-so-far player-for-slot)
         remaining-slots)))))
 
+(defn roster-score [roster]
+  (reduce + (map :magnitude roster)))
+
+;; State
+
 (defonce app-state
   (reagent/atom
    {:all-players players
@@ -93,6 +98,7 @@
      [:thead
       [:tr
        [:th "Member"]
+       [:th "Draft Score"]
        (for [[slot-index slot] (map-indexed vector roster-slots)]
          ^{:key slot-index}
          [:th slot])]]
@@ -105,6 +111,7 @@
            (if (= member me) "me" "opponent")
            (if (= member next-member-to-pick) " next-pick"))}
          [:th member]
+         [:td (roster-score (roster-from-players (picked-players-for-member member state)))]
          (for [[roster-index player] (map-indexed vector (roster-from-players (picked-players-for-member member state)))]
            ^{:key roster-index}
            [:td (or (:name player) [:i "empty"])])])]]))
