@@ -104,17 +104,18 @@
          [:th slot])]]
      [:tbody
       (for [member members-in-draft-order]
-        ^{:key member}
-        [:tr
-         {:class
-          (str
-           (if (= member me) "me" "opponent")
-           (if (= member next-member-to-pick) " next-pick"))}
-         [:th member]
-         [:td (roster-score (roster-from-players (picked-players-for-member member state)))]
-         (for [[roster-index player] (map-indexed vector (roster-from-players (picked-players-for-member member state)))]
-           ^{:key roster-index}
-           [:td (or (:name player) [:i "empty"])])])]]))
+        (let [member-roster (roster-from-players (picked-players-for-member member state))]
+          ^{:key member}
+          [:tr
+           {:class
+            (str
+             (if (= member me) "me" "opponent")
+             (if (= member next-member-to-pick) " next-pick"))}
+           [:th member]
+           [:td (roster-score member-roster)]
+           (for [[roster-index player] (map-indexed vector member-roster)]
+             ^{:key roster-index}
+             [:td (or (:name player) [:i "empty"])])]))]]))
 
 (defn players-table []
   (let [state @app-state]
