@@ -5,7 +5,7 @@
   ["QB" "RB" "RB" "WR" "TE" "Flex" "K" "Bench" "Bench"])
 
 (def positions
-  (difference (set roster-composition) #{"Flex" "Bench"}))
+  (difference (set roster-slots) #{"Flex" "Bench"}))
 
 ;; TODO update with proper order
 ;; Is this it? http://games.espn.go.com/ffl/tools/draftorder?leagueId=654210
