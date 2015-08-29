@@ -1,7 +1,9 @@
 (ns fantasy-football-2015.aggregate-players
   (:require [fantasy-football-2015.generated.cbs]
             [fantasy-football-2015.generated.espn]
-            [fantasy-football-2015.generated.yahoo]))
+            [fantasy-football-2015.generated.yahoo]
+            [clojure.core.matrix :as matrix]
+            [clojure.java.io :as io]))
 
 ;; TODO more clojure-y way to do this?
 
@@ -32,8 +34,10 @@
   (let [matching-player-vals (vals matching-players)
         values (map key matching-player-vals)
         uniq-values (set (remove nil? values))]
-    (if (> (count uniq-values) 1)
-      (println (str "found multiple " key " for " player-name)))
+    ;; TODO restore logging
+    ;; (if (> (count uniq-values) 1)
+    ;;   (println (str "found multiple " key " for " player-name)))
+
     (first uniq-values)))
 
 (defn build-player-by-name [player-name]
@@ -41,23 +45,30 @@
     {:name player-name
      :position (extract-single-value player-name matching-players :position)
      :team (extract-single-value player-name matching-players :team)
-     :values (map :value (vals matching-players))}))
+     :values (vec (map :value (vals matching-players)))}))
 
 (defn normalize-player-values [max-values player]
-  (update-in player [:values]
-             (fn [values]
-               (apply vector (map (fn [[value max-value]]
-                              (if (nil? value)
-                                0
-                                (/ value max-value)))
-                            (map vector values max-values))))))
+  (let [values (:values player)
+        double-values (vec (map #(if (nil? %1) 0.0 (double %1)) values))
+        normalized-values (apply vector (map (fn [[value max-value]]
+                                               (/ value max-value))
+                                             (map vector double-values max-values)))
+        magnitude (matrix/length normalized-values)]
+    (assoc player
+           :values double-values
+           :normalized-values normalized-values
+           :magnitude magnitude)))
 
 (defn build-player-list []
   (let [player-list (map build-player-by-name (all-player-names))
         all-values (map :values player-list)
         columnar-values (apply map vector all-values)
         max-values (map #(apply max (remove nil? %1)) columnar-values)]
-    (map (partial normalize-player-values max-values) player-list)))
+    (vec (map (partial normalize-player-values max-values) player-list))))
+
+(def output-file "src/cljs/fantasy_football_2015/generated/players.cljs")
 
 (defn -main []
-  (prn (build-player-list)))
+  (with-open [wrtr (io/writer output-file)]
+    (.write wrtr (prn-str '(ns fantasy-football-2015.generated.players)))
+    (.write wrtr (prn-str `(def ~'players ~(build-player-list))))))
