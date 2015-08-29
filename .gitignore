@@ -3,3 +3,5 @@ resources/public/js/compiled
 target
 src/cljs/fantasy_football_2015/generated/
 src/clj/fantasy_football_2015/generated/
+.lein-repl-history
+.nrepl-port
