@@ -1,6 +1,7 @@
 (ns fantasy-football-2015.core
   (:require [reagent.core :as reagent]
             [clojure.set :refer [difference]]
+            [fantasy-football-2015.generated.players :refer [players]]
             [
              ;;fantasy-football-2015.bastards
              fantasy-football-2015.toy
@@ -69,12 +70,11 @@
         remaining-slots)))))
 
 (defonce app-state
-  (let [players (build-player-list)]
-    (reagent/atom
-     {:all-players players
-      :available-players players
-      :members-in-draft-order members-in-draft-order
-      :picked-players []})))
+  (reagent/atom
+   {:all-players players
+    :available-players players
+    :members-in-draft-order members-in-draft-order
+    :picked-players []}))
 
 ;; Actions
 
@@ -117,14 +117,18 @@
        [:th "Player"]
        [:th "Team"]
        [:th "Position"]
-       [:th "Values"]
+       [:th "Magnitude"]
+       [:th "Normalized"]
+       [:th "Raw"]
        [:td]]
-      (for [player (reverse (sort-by #(apply min (:values %1)) (unpicked-players state)))]
+      (for [player (reverse (sort-by :magnitude (unpicked-players state)))]
         ^{:key (:name player)}
         [:tr
          [:td (:name player)]
          [:td (:team player)]
          [:td (:position player)]
+         [:td (:magnitude player)]
+         [:td (pr-str (:normalized-values player))]
          [:td (pr-str (:values player))]
          [:td [:button {:on-click (partial pick-player player)} "Draft"]]])]]))
 
