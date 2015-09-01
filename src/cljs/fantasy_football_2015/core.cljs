@@ -102,6 +102,11 @@
          (fn [state]
            (update-in state [:picked-players] #(conj %1 player)))))
 
+(defn undo-last-pick []
+  (swap! app-state
+         (fn [state]
+           (update-in state [:picked-players] pop))))
+
 ;; View Helpers
 
 (defn format-float [f]
@@ -133,7 +138,11 @@
            [:td (format-float (roster-score member-roster))]
            (for [[roster-index player] (map-indexed vector member-roster)]
              ^{:key roster-index}
-             [:td (or (:name player) [:i "empty"])])]))]]))
+             [:td (if player
+                    [:span (:name player)
+                     (if (= player (last (:picked-players state)))
+                       [:button {:on-click undo-last-pick} "Undo"])]
+                   [:i "empty"])])]))]]))
 
 (defn players-table []
   (let [state @app-state]
