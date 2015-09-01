@@ -20,7 +20,11 @@
         name (clojure.string/trim (html/text (first (html/select name-cell [:a]))))
         [_ value] (re-find #" \$(\d+) " (html/text name-cell))
         [_ team] (re-find #"\W([A-Z]{2,3})\W" (html/text name-cell))]
-    {:name (if (= "DST" position) team name)
+    {:name (if (= "DST" position)
+             team
+             (if (= "Odell Beckham" name)
+               "Odell Beckham Jr."
+               name))
      :position position
      :team (if (= team "III") "WAS" team) ;; RG3 hack
      :posrank (read-string posrank)
