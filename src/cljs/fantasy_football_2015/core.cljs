@@ -55,7 +55,7 @@
 
 (defn best-player-for-slot [slot players]
   (let [eligible-players (filter (partial player-can-fill-roster-slot? slot) players)]
-    (apply max-key :value eligible-players)))
+    (apply max-key :magnitude eligible-players)))
 
 (defn roster-from-players
   ([players] (roster-from-players (set players) [] roster-slots))
