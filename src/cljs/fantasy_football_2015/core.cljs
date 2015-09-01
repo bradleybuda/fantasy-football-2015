@@ -1,6 +1,8 @@
 (ns fantasy-football-2015.core
   (:require [reagent.core :as reagent]
             [clojure.set :refer [difference]]
+            [goog.string :as gstring]
+            [goog.string.format]
             [fantasy-football-2015.generated.players :refer [players]]
             [
              ;;fantasy-football-2015.bastards
@@ -72,6 +74,18 @@
 (defn roster-score [roster]
   (reduce + (map :magnitude roster)))
 
+(defn mean [numbers]
+  (/ (reduce + numbers) (count numbers)))
+
+(defn variance [numbers]
+  (let [m (mean numbers)
+        differences (map (partial - m) numbers)
+        squared-differences (map #(Math/pow %1 2) differences)]
+    (mean squared-differences)))
+
+(defn standard-deviation [numbers]
+  (Math/sqrt (variance numbers)))
+
 ;; State
 
 (defonce app-state
@@ -88,6 +102,10 @@
          (fn [state]
            (update-in state [:picked-players] #(conj %1 player)))))
 
+;; View Helpers
+
+(defn format-float [f]
+  (gstring/format "%.2f" f))
 
 ;; Views
 
@@ -112,7 +130,7 @@
              (if (= member me) "me" "opponent")
              (if (= member next-member-to-pick) " next-pick"))}
            [:th member]
-           [:td (roster-score member-roster)]
+           [:td (format-float (roster-score member-roster))]
            (for [[roster-index player] (map-indexed vector member-roster)]
              ^{:key roster-index}
              [:td (or (:name player) [:i "empty"])])]))]]))
@@ -125,9 +143,8 @@
        [:th "Player"]
        [:th "Team"]
        [:th "Position"]
-       [:th "Magnitude"]
-       [:th "Normalized"]
-       [:th "Raw"]
+       [:th "Mean"]
+       [:th "StdDev"]
        [:td]]
       (for [player (reverse (sort-by :magnitude (unpicked-players state)))]
         ^{:key (:name player)}
@@ -135,9 +152,8 @@
          [:td (:name player)]
          [:td (:team player)]
          [:td (:position player)]
-         [:td (:magnitude player)]
-         [:td (pr-str (:normalized-values player))]
-         [:td (pr-str (:values player))]
+         [:td (format-float (:magnitude player))]
+         [:td (format-float (standard-deviation (:normalized-values player)))]
          [:td [:button {:on-click (partial pick-player player)} "Draft"]]])]]))
 
 (defn page []
