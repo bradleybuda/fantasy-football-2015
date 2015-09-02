@@ -122,12 +122,15 @@
       [:tr
        [:th "Member"]
        [:th "Draft Score"]
+       [:th "Max Score"]
        (for [[slot-index slot] (map-indexed vector roster-slots)]
          ^{:key slot-index}
          [:th slot])]]
      [:tbody
       (for [member members-in-draft-order]
-        (let [member-roster (roster-from-players (picked-players-for-member member state))]
+        (let [picked-players (picked-players-for-member member state)
+              member-roster (roster-from-players picked-players)
+              best-possible-roster (roster-from-players (concat picked-players (unpicked-players state)))]
           ^{:key member}
           [:tr
            {:class
@@ -136,6 +139,7 @@
              (if (= member next-member-to-pick) " next-pick"))}
            [:th member]
            [:td (format-float (roster-score member-roster))]
+           [:td (format-float (roster-score best-possible-roster))]
            (for [[roster-index player] (map-indexed vector member-roster)]
              ^{:key roster-index}
              [:td (if player
