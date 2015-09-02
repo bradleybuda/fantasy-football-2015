@@ -117,7 +117,7 @@
 (defn members-table []
   (let [state @app-state
         next-member-to-pick (next-member-to-pick state)]
-    [:table.members-table
+    [:table.table.members-table
      [:thead
       [:tr
        [:th "Member"]
@@ -146,7 +146,7 @@
 
 (defn players-table []
   (let [state @app-state]
-    [:table
+    [:table.table
      [:tbody
       [:tr
        [:th "Player"]
