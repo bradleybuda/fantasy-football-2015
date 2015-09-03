@@ -143,7 +143,9 @@
            (for [[roster-index player] (map-indexed vector member-roster)]
              ^{:key roster-index}
              [:td (if player
-                    [:span (:name player)
+                    [:span
+                     [:span (:name player)]
+                     [:p.small (format-float (:magnitude player))]
                      (if (= player (last (:picked-players state)))
                        [:button {:on-click undo-last-pick} "Undo"])]
                    [:i "empty"])])]))]]))
