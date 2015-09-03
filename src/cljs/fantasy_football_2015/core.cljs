@@ -169,7 +169,8 @@
       (for [player (reverse (sort-by :magnitude (unpicked-players state)))]
         ^{:key (:name player)}
         [:tr
-         [:td (:name player)]
+         [:td (:name player)
+          [:a {:href (str "https://www.google.com/search?q=" (:name player)) :target "_blank"} " ?"]]
          [:td (:team player)]
          [:td (:position player)]
          [:td (format-float (:magnitude player))]
