@@ -121,7 +121,8 @@
 
 (defn members-table []
   (let [state @app-state
-        next-member-to-pick (next-member-to-pick state)]
+        next-member-to-pick (next-member-to-pick state)
+        last-picked-player (last (:picked-players state))]
     [:table.table.table-bordered.table-striped.members-table
      [:thead
       [:tr
@@ -151,7 +152,7 @@
                     [:span
                      [:span (:name player)]
                      [:p.small (format-float (:magnitude player))]
-                     (if (= player (last (:picked-players state)))
+                     (if (= player last-picked-player)
                        [:button {:on-click undo-last-pick} "Undo"])]
                    [:small "none"])])]))]]))
 
