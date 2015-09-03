@@ -153,7 +153,7 @@
                      [:span (:name player)]
                      [:p.small (format-float (:magnitude player))]
                      (if (= player last-picked-player)
-                       [:button {:on-click undo-last-pick} "Undo"])]
+                       [:button.btn.btn-sm {:on-click undo-last-pick} "Undo"])]
                    [:small "none"])])]))]]))
 
 (defn players-table []
@@ -176,7 +176,7 @@
          [:td (:position player)]
          [:td (format-float (:magnitude player))]
          [:td (format-float (standard-deviation (:normalized-values player)))]
-         [:td [:button {:on-click (partial pick-player player)} "Draft"]]])]]))
+         [:td [:button.btn.btn-sm {:on-click (partial pick-player player)} "Draft"]]])]]))
 
 (defn page []
   [:div.page
