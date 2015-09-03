@@ -1,7 +1,3 @@
-body {
-  background-color: #efefef;
-}
-
 .page {
   display: flex;
   flex-direction: row;
@@ -13,5 +9,5 @@ body {
 }
 
 .members-table .next-pick {
-  background-color: lightblue;
+  background-color: lightblue !important;
 }
