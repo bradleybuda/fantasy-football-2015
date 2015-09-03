@@ -5,8 +5,7 @@
             [goog.string.format]
             [fantasy-football-2015.generated.players :refer [players]]
             [
-             ;;fantasy-football-2015.bastards
-             fantasy-football-2015.toy
+             fantasy-football-2015.sundayfunday
              :refer [roster-slots members-in-draft-order]
              ]))
 
@@ -26,7 +25,7 @@
 ;; Navigate away warning if any picks made
 ;; Undo pick
 
-(def me "Bradley Buda")
+(def me "Big House of Pain")
 
 ;; zero-based
 (defn next-pick-index [{:keys [picked-players]}]
@@ -72,7 +71,13 @@
         remaining-slots)))))
 
 (defn roster-score [roster]
-  (reduce + (map :magnitude roster)))
+  (let [players-and-positions (map vector roster roster-slots)]
+    (reduce + (map
+               (fn [[player position]]
+                 (if (= "Bench" position)
+                   (* 0.5 (:magnitude player))
+                   (:magnitude player)))
+               players-and-positions))))
 
 (defn mean [numbers]
   (/ (reduce + numbers) (count numbers)))
@@ -117,7 +122,7 @@
 (defn members-table []
   (let [state @app-state
         next-member-to-pick (next-member-to-pick state)]
-    [:table.table.members-table
+    [:table.table.table-bordered.table-striped.members-table
      [:thead
       [:tr
        [:th "Member"]
@@ -152,7 +157,7 @@
 
 (defn players-table []
   (let [state @app-state]
-    [:table.table
+    [:table.table.table-bordered.table-striped
      [:tbody
       [:tr
        [:th "Player"]
