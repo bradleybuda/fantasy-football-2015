@@ -153,7 +153,7 @@
                      [:p.small (format-float (:magnitude player))]
                      (if (= player (last (:picked-players state)))
                        [:button {:on-click undo-last-pick} "Undo"])]
-                   [:i "empty"])])]))]]))
+                   [:small "none"])])]))]]))
 
 (defn players-table []
   (let [state @app-state]
