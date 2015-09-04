@@ -43,8 +43,8 @@
                    (= member picking-member))
                  picked-players-with-members))))
 
-(defn unpicked-players [{:keys [picked-players all-players]}]
-  (difference (set all-players) (set picked-players)))
+(defn unpicked-players [{:keys [picked-players all-players blacklisted-players]}]
+  (reduce difference [all-players (set picked-players) blacklisted-players]))
 
 (defn player-can-fill-roster-slot? [slot player]
   (condp = slot
@@ -93,10 +93,10 @@
 
 (defonce app-state
   (reagent/atom
-   {:all-players players
-    :available-players players
+   {:all-players (set players)
     :members-in-draft-order members-in-draft-order
-    :picked-players []}))
+    :picked-players []
+    :blacklisted-players #{}}))
 
 ;; Actions
 
@@ -104,6 +104,11 @@
   (swap! app-state
          (fn [state]
            (update-in state [:picked-players] #(conj %1 player)))))
+
+(defn blacklist-player [player]
+  (swap! app-state
+         (fn [state]
+           (update-in state [:blacklisted-players] #(conj %1 player)))))
 
 (defn undo-last-pick []
   (swap! app-state
@@ -174,7 +179,9 @@
          [:td (:position player)]
          [:td (format-float (:magnitude player))]
          [:td (format-float (standard-deviation (:normalized-values player)))]
-         [:td [:button.btn.btn-sm {:on-click (partial pick-player player)} "Draft"]]])]]))
+         [:td
+          [:button.btn.btn-sm {:on-click (partial pick-player player)} "Draft"]
+          [:button.btn.btn-sm {:on-click (partial blacklist-player player)} "Blacklist"]]])]]))
 
 (defn page []
   [:div.page
