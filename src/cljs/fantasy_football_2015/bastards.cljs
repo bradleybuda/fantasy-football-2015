@@ -3,11 +3,21 @@
 (def roster-slots
   ["QB" "RB" "RB" "WR" "WR" "TE" "Flex" "K" "DST" "Bench" "Bench" "Bench" "Bench" "Bench" "Bench" "Bench"])
 
-(def me :bradley-buda)
+(def me "Draft Bot 5000")
 
 (def members-in-draft-order
   ;; TBD
   [
-   :larry-whalen :david-baum :blake-wilson :michael-aslanides
-   :kevin-worley :will-morton :bradley-buda :sam-strasfeld
-   :jeff-mazer :eric-eleton :nick-horton :josh-harris])
+   "Daler Daler Bills"
+   "Peyton for President"
+   "Captain Canuck"
+   "That's Not My Molly"
+   "In Gronk We Trust"
+   "Old N Broke"
+   "Dalton of Fantasy"
+   "Let the Wookie Win"
+   "Stick it in Your Cornhole!!"
+   "I'm still in it!!!!"
+   "Off Constantly"
+   "Draft Bot 5000"
+   ])
