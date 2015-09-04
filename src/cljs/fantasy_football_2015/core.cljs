@@ -105,15 +105,20 @@
          (fn [state]
            (update-in state [:picked-players] #(conj %1 player)))))
 
+(defn undo-last-pick []
+  (swap! app-state
+         (fn [state]
+           (update-in state [:picked-players] pop))))
+
 (defn blacklist-player [player]
   (swap! app-state
          (fn [state]
            (update-in state [:blacklisted-players] #(conj %1 player)))))
 
-(defn undo-last-pick []
+(defn undo-blacklist-player [player]
   (swap! app-state
          (fn [state]
-           (update-in state [:picked-players] pop))))
+           (update-in state [:blacklisted-players] #(disj %1 player)))))
 
 ;; View Helpers
 
@@ -169,7 +174,7 @@
        [:th "Position"]
        [:th "Mean"]
        [:th "StdDev"]
-       [:td]]
+       [:th "Actions"]]
       (for [player (reverse (sort-by :magnitude (unpicked-players state)))]
         ^{:key (:name player)}
         [:tr
@@ -183,13 +188,31 @@
           [:button.btn.btn-sm {:on-click (partial pick-player player)} "Draft"]
           [:button.btn.btn-sm {:on-click (partial blacklist-player player)} "Blacklist"]]])]]))
 
+(defn blacklist-table []
+  (let [state @app-state]
+    [:table.table.table-bordered.table-striped
+     [:caption "Blacklisted Players"]
+     [:thead
+      [:tr
+       [:th "Player"]
+       [:th "Actions"]]]
+     [:tbody
+      (for [player (:blacklisted-players state)]
+        ^{:key (:name player)}
+        [:tr
+         [:td (:name player)]
+         [:td
+          [:button.btn.btn-sm {:on-click (partial undo-blacklist-player player)} "Undo"]]])]]
+    ))
+
 (defn page []
   [:div.page
 ;;   [:pre.debug (pr-str @app-state)]
    [:div.members
     [members-table]]
    [:div.players
-    [players-table]]])
+    [players-table]
+    [blacklist-table]]])
 
 ;; main
 
