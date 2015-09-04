@@ -5,8 +5,8 @@
             [goog.string.format]
             [fantasy-football-2015.generated.players :refer [players]]
             [
-             fantasy-football-2015.sundayfunday
-             :refer [roster-slots members-in-draft-order]
+             fantasy-football-2015.bastards
+             :refer [me roster-slots members-in-draft-order]
              ]))
 
 (enable-console-print!)
@@ -24,8 +24,6 @@
 ;; Weight earlier matchups heavier
 ;; Navigate away warning if any picks made
 ;; Undo pick
-
-(def me "Big House of Pain")
 
 ;; zero-based
 (defn next-pick-index [{:keys [picked-players]}]

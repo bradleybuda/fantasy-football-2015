@@ -1,5 +1,7 @@
 (ns fantasy-football-2015.sundayfunday)
 
+(def me "Big House of Pain")
+
 (def roster-slots
   ["QB" "WR" "WR" "RB" "RB" "TE" "Flex" "K" "DST" "Bench" "Bench" "Bench" "Bench" "Bench"])
 
