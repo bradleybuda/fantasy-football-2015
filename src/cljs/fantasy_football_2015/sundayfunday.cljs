@@ -6,17 +6,16 @@
 (def members-in-draft-order
   [
    ;; TBD
-
-   "Big House of Pain"
-   "Long Duck Horn"
-   "Quack Mamba"
+   "Silver Crush Yo Face"
    "J-U-A-N"
-   "Yeung Money"
+   "Cartographers United"
+   "WWPBD"
    "Shark"
    "Chicken Strips"
-   "Cartographers United"
-   "Silver Crush Yo Face"
-   "WWPBD"
+   "Big House of Pain"
+   "Yeung Money"
+   "Long Duck Horn"
    "SC-Unit"
    "rushin russians"
+   "Quack Mamba"
    ])
